@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using TGS;
+using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 
@@ -17,6 +18,8 @@ public class TerrainGridManager : MonoBehaviour
     private const string getCellsUrl = "http://127.0.0.1:9090/cells";
     private const string deleteALL = "http://127.0.0.1:9090/clear";
     private List<TerrainCellData> dataCells;
+
+    public Transform UiRoot; 
 
 
     private void Awake()
@@ -183,6 +186,7 @@ public class TerrainGridManager : MonoBehaviour
         data.productivite = data.regionData.productionRateBase;
         data.level = 0;
 
+        
 
         data.CalculateMaterialsNeededForNextUpgrade();
         StartCoroutine(CreateCellInDatabase(data));
@@ -204,12 +208,29 @@ public class TerrainGridManager : MonoBehaviour
         // Handle the response
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Cell created in the database: ");
+            if (data.index == 58 && data.level == 0)
+            {
+                StartCoroutine(GetCellByIndex(data.index));              
+            }
+            DrawCellLevelUi(data);
+
         }
         else
         {
             Debug.LogError("Failed to create cell in the database: " + request.error);
         }
+    }
+    public void DrawCellLevelUi(TerrainCellData data)
+    {
+        Transform existingUi = UiRoot.Find("CellUI_" + data.index);
+        if (existingUi != null)
+        {
+            Destroy(existingUi.gameObject);
+        }
+
+        GameObject cellUi = Instantiate(cellUiPrefab, new Vector3(tgs.CellGetPosition(data.index).x, tgs.CellGetPosition(data.index).y + 3f, tgs.CellGetPosition(data.index).z), Quaternion.identity, UiRoot);
+        cellUi.name = "CellUI_" + data.index; 
+        cellUi.GetComponentInChildren<TextMeshProUGUI>().text = data.level.ToString();
     }
 
     private IEnumerator GetAllCellsInDatabase()
@@ -260,7 +281,7 @@ public class TerrainGridManager : MonoBehaviour
 
                 data.productivite = cellData.productivite;
                 data.level = cellData.level;
-                Instantiate(cellUiPrefab, new Vector3(tgs.CellGetPosition(data.index).x,2, tgs.CellGetPosition(data.index).y), Quaternion.identity);
+                DrawCellLevelUi(data);
 
 
                 data.CalculateMaterialsNeededForNextUpgrade();
@@ -349,6 +370,7 @@ public class TerrainGridManager : MonoBehaviour
             Debug.Log("Cell updated successfully: "+ cellData.index);
             tgs.CellSetColor(cellData.index, Color.clear);
             tgs.CellFlash(cellData.index, Color.yellow, 2, 3);
+            DrawCellLevelUi(cellData);
         }
         else
         {

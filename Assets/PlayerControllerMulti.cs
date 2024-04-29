@@ -5,6 +5,7 @@ using Mirror;
 using GameCreator.Runtime.Characters;
 using Cinemachine;
 using GameCreator.Runtime.VisualScripting;
+using System;
 
 public class PlayerControllerMulti : NetworkBehaviour
 {
@@ -22,16 +23,10 @@ public class PlayerControllerMulti : NetworkBehaviour
     void Start()
     {
         if (!isLocalPlayer)
-        {
+        {           
             return;
         }
-        //Test with Game Creator
-        //character = GetComponent<Character>();
-        //character.enabled = true;
-        //trigger.enabled = true;
 
-
-        //Test with CharacterController
         cc.enabled = true;
         controller.enabled = true;
 
@@ -39,20 +34,11 @@ public class PlayerControllerMulti : NetworkBehaviour
         GameObject mainCamera = GameObject.FindWithTag("MainCamera");      
         mainCamera.GetComponent<Camera>().enabled = true;
         playerCamera.Priority = 10;
- 
+
+       
     }
 
-    //public override void OnStartClient()
-    //{
-    //    base.OnStartClient();
 
-    //    if (!isLocalPlayer)
-    //    {
-    //        character.enabled = true;
-    //        trigger.enabled = true;
-    //        jump.enabled = true;
-    //    }
-    //}
 
     public override void OnStartLocalPlayer()
     {
@@ -65,12 +51,15 @@ public class PlayerControllerMulti : NetworkBehaviour
         ui.transform.SetParent(transform);
         //GameObject uichat = Instantiate(UiChatPrefab);
         //uichat.transform.SetParent(transform);
-        Debug.Log(PlayerPrefs.GetString("Username"));
+
         GameObject chat = GameObject.FindWithTag("chatLog");
+        GetComponent<LootSceneManager>().countDownTimerUi = chat.GetComponentInChildren<CountDownTimerUi>();
         GetComponent<ChatBehavior>().chatText = chat.GetComponent<ChatPopup>().chatText;
         GetComponent<ChatBehavior>().inputField = chat.GetComponent<ChatPopup>().inputField;
         GetComponent<ChatBehavior>().chatButton = chat.GetComponent<ChatPopup>().openChat;
         GetComponent<ChatBehavior>().chatButton.onClick.AddListener(delegate { GetComponent<ChatBehavior>().Send(); });
-        ui.GetComponentInChildren<BoostUI>().countDownTimerUi = chat.GetComponentInChildren<CountDownTimerUi>();
+
+
+
     }
 }

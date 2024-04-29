@@ -54,6 +54,7 @@ GameObject:
   - component: {fileID: 2321104578889315455}
   - component: {fileID: 1828063401636146308}
   - component: {fileID: 4146209058906776699}
+  - component: {fileID: 4839104737599849789}
   m_Layer: 0
   m_Name: Player
   m_TagString: Player
@@ -392,6 +393,23 @@ MonoBehaviour:
   chatText: {fileID: 0}
   inputField: {fileID: 0}
   chatButton: {fileID: 0}
+--- !u!114 &4839104737599849789
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 823814125750375217}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 8e2565c8bed8b164288c7da762aa4326, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  syncDirection: 0
+  syncMode: 0
+  syncInterval: 0
+  countDownTimerUi: {fileID: 0}
+  timeText: {fileID: 0}
 --- !u!1 &913530650339087258
 GameObject:
   m_ObjectHideFlags: 0

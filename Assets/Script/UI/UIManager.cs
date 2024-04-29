@@ -91,7 +91,7 @@ public class UIManager : MonoBehaviour
         //    UpdateUiStorage();
         //}
 
-
+       
         tgs = TerrainGridSystem.instance;
         UpdateUiStorage();
         UpdateUiProduction();
@@ -102,9 +102,7 @@ public class UIManager : MonoBehaviour
         MoreButton.onClick.AddListener(() => UpdateCellDescription());
   
 
-        Gem.text = ResourceManager.Instance.Gem.ToString();
-
-
+        Gem.text = ResourceManager.Instance.Gem.ToString();       
     }
 
 
@@ -233,7 +231,7 @@ public class UIManager : MonoBehaviour
         }
         UpdateCellDescription();
         UpdateUiStorage();
-
+        TerrainGridManager.Instance.DrawCellLevelUi(cellDisplay.currentCell);
         StartCoroutine(UpdateCellDataRequest(cellDisplay.currentCell._id, cell.level));
     }
 

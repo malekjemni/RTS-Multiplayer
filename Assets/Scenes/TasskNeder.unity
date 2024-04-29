@@ -1261,6 +1261,7 @@ MonoBehaviour:
   - {fileID: 11400000, guid: da11cd79fb235634493f48ebcbd88f4e, type: 2}
   - {fileID: 11400000, guid: 84f615b9d2e62d14aa17282a946d051f, type: 2}
   cellUiPrefab: {fileID: 2457953331946763050, guid: 1f3cb13dbd6164946ba9b71ec932547b, type: 3}
+  UiRoot: {fileID: 2024176997}
 --- !u!4 &21978815 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4690334271564126, guid: 6f62c6f9e92a8ed44878e929e7e8db3f, type: 3}
@@ -15918,6 +15919,11 @@ MonoBehaviour:
   MaxReached: {fileID: 388861762}
   MaxReachedText: {fileID: 74077664}
   uiTest: {fileID: 1676786175}
+  playerStorageData:
+    storagewood: 0
+    storagemud: 0
+    storageclay: 0
+    storageenergie: 0
 --- !u!1001 &670563155
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -46290,6 +46296,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 6269997286673358207, guid: 1e6f30c25a4945041801793bf5b599d5, type: 3}
   m_PrefabInstance: {fileID: 2017255813}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &2024176996
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 2024176997}
+  m_Layer: 5
+  m_Name: Uicells
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &2024176997
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 2024176996}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 0, y: 0, z: 0}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!4 &2030036758 stripped
 Transform:
   m_CorrespondingSourceObject: {fileID: 4082468324179482, guid: f6a0cd899fb3b8c449a40e5fb69e258d, type: 3}
@@ -46554,7 +46591,6 @@ MonoBehaviour:
   ProductivityText: {fileID: 1183871234}
   LevelText: {fileID: 1679591885}
   StateText: {fileID: 1138425794}
-  uiManager: {fileID: 668502365}
   currentCell:
     regionData: {fileID: 0}
     region: 
@@ -50130,3 +50166,4 @@ SceneRoots:
   - {fileID: 377822744}
   - {fileID: 795770228}
   - {fileID: 1676786179}
+  - {fileID: 2024176997}

@@ -1,10 +1,6 @@
-using Mirror;
 using System.Collections;
-using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
-using UnityEngine.Networking;
-using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public class BoostUI : MonoBehaviour
@@ -14,11 +10,6 @@ public class BoostUI : MonoBehaviour
     public TextMeshProUGUI BoostText;
     public GameObject boxText;
     public GameObject slider;
-    public CountDownTimerUi countDownTimerUi;
-
-
-    public TextMeshProUGUI timeText;
-    private bool isFinished = false;
 
 
     public void SetBoxText(bool _state)
@@ -61,38 +52,5 @@ public class BoostUI : MonoBehaviour
         yield return new WaitForSeconds(2f);
         BoostText.gameObject.SetActive(false);
     }
-
-
-    private void Update()
-    {
-        if (countDownTimerUi.countDownTimerString.Equals("00:00") && !isFinished && TimerSync.Instance.isCountDownTimerRunning)
-        {
-            EndLootScene();
-            isFinished = true;
-        }
-    }
-    public void EndLootScene() 
-     {         
-       StartCoroutine(DeleteRooms());    
-    }
-    public IEnumerator DeleteRooms()
-    {
-        string url = "http://127.0.0.1:9090/rooms/clear";
-        UnityWebRequest request = UnityWebRequest.Delete(url);
-
-        yield return request.SendWebRequest();
-        if (request.result == UnityWebRequest.Result.Success)
-        {
-            NetworkManager.singleton.StopHost();
-            NetworkManager.singleton.StopClient();
-            TimerSync.Instance.StopCountDownTimer();
-            SceneManager.LoadScene("TasskNeder", LoadSceneMode.Single);
-        }
-        else
-        {
-            Debug.LogError($"Failed to delete all rooms: {request.error}");
-        }
-    }
-  
-
+ 
 }

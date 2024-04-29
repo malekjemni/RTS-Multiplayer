@@ -125,10 +125,16 @@ public class CollectHandler : NetworkBehaviour
             GetComponent<ChatBehavior>().ShowChatLog("the item " + loot.GetComponent<LootItem>().itemName);
             if(loot.GetComponent<LootItem>().itemName == "Gold")
             {
-                transform.Find("UiPlayer").GetComponent<BoostUI>().EndLootScene();
-               // ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeSolaire,5000);
+                GetComponent<LootSceneManager>().EndLootScene();           
             }
       
+        }
+        else
+        {
+            if (loot.GetComponent<LootItem>().itemName == "Gold")
+            {
+                GetComponent<LootSceneManager>().EndLootScene();
+            }
         }
         Destroy(loot);
     }
