@@ -18,8 +18,10 @@ public class TerrainGridManager : MonoBehaviour
     private const string getCellsUrl = "http://127.0.0.1:9090/cells";
     private const string deleteALL = "http://127.0.0.1:9090/clear";
     private List<TerrainCellData> dataCells;
+    private List<string> cellIds = new List<string>();
+    private string worldId;
 
-    public Transform UiRoot; 
+    public Transform UiRoot;
 
 
     private void Awake()
@@ -30,27 +32,18 @@ public class TerrainGridManager : MonoBehaviour
 
     private void Start()
     {
-        //Hethi acitviha ki awel mara bech thel database
-        //CreateNewTerrain();
-        LoadTerrain();
+        StartCoroutine(CheckIfPlayerHasWorld());
     }
-
-
     public void CreateNewTerrain()
     {
-        //when database is empty InitializeGrid()
-        InitializeGrid();
-        //StartCoroutine(DeleteAllCells());      
+        InitializeGrid();    
         StartCoroutine("InitiateStartingGrid");
-    }   
+    }
     public void LoadTerrain()
     {
         StartCoroutine(GetAllCellsInDatabase());
         StartCoroutine("InitiateStartingGrid");
     }
-
-
-
     public void InitializeGrid()
     {
 
@@ -84,8 +77,6 @@ public class TerrainGridManager : MonoBehaviour
             }
         }
     }
-
-
     public TerrainCellData GetCellData(int index)
     {
         for (int x = 0; x < tgs.columnCount; x++)
@@ -104,10 +95,6 @@ public class TerrainGridManager : MonoBehaviour
         }
         return null;
     }
-
-
-
-
     private IEnumerator InitiateStartingGrid()
     {
         yield return new WaitForSeconds(1.5f);
@@ -124,7 +111,6 @@ public class TerrainGridManager : MonoBehaviour
 
         }
     }
-
     public int ActiveCellsInRegion(int index)
     {
         int counter = 0;
@@ -137,9 +123,6 @@ public class TerrainGridManager : MonoBehaviour
         }
         return counter;
     }
-
-
-
     public void OpenNewCell(TerrainCellData cellData)
     {
         int regionIndex = cellData.regionData.index;
@@ -152,20 +135,18 @@ public class TerrainGridManager : MonoBehaviour
         GetCellData(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index).level = 1;
 
         GetCellData(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index).state = true;
-       
+
         StartCoroutine(GetCellByIndex(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index));
-        
+
 
     }
-
-
     private TerrainCellData GenerateCellData(int x, int y)
     {
         TerrainCellData data = new TerrainCellData();
 
 
         data.index = tgs.CellGetIndex(x, y, true);
-
+        data.owner = CurrentUserManager.Instance.GetCurrentUserId();
         data.state = false;
         int territoryIndex = tgs.CellGetTerritoryIndex(data.index);
 
@@ -182,11 +163,11 @@ public class TerrainGridManager : MonoBehaviour
         }
 
         // Initialize level
-       
+
         data.productivite = data.regionData.productionRateBase;
         data.level = 0;
 
-        
+
 
         data.CalculateMaterialsNeededForNextUpgrade();
         StartCoroutine(CreateCellInDatabase(data));
@@ -208,12 +189,8 @@ public class TerrainGridManager : MonoBehaviour
         // Handle the response
         if (request.result == UnityWebRequest.Result.Success)
         {
-            if (data.index == 58 && data.level == 0)
-            {
-                StartCoroutine(GetCellByIndex(data.index));              
-            }
-            DrawCellLevelUi(data);
-
+            StartCoroutine(AddCellToWorld(worldId, JsonUtility.FromJson<TerrainCellData>(request.downloadHandler.text)._id,data));
+          
         }
         else
         {
@@ -229,10 +206,9 @@ public class TerrainGridManager : MonoBehaviour
         }
 
         GameObject cellUi = Instantiate(cellUiPrefab, new Vector3(tgs.CellGetPosition(data.index).x, tgs.CellGetPosition(data.index).y + 3f, tgs.CellGetPosition(data.index).z), Quaternion.identity, UiRoot);
-        cellUi.name = "CellUI_" + data.index; 
+        cellUi.name = "CellUI_" + data.index;
         cellUi.GetComponentInChildren<TextMeshProUGUI>().text = data.level.ToString();
     }
-
     private IEnumerator GetAllCellsInDatabase()
     {
         UnityWebRequest request = UnityWebRequest.Get(getCellsUrl);
@@ -250,9 +226,6 @@ public class TerrainGridManager : MonoBehaviour
             Debug.LogError("Error fetching cells: " + request.error);
         }
     }
-
-
-
     public TerrainCellData PopulateGridWithCellData(int x, int y)
     {
         TerrainCellData data = new TerrainCellData();
@@ -262,7 +235,7 @@ public class TerrainGridManager : MonoBehaviour
             if (cellData.index == tgs.CellGetIndex(x, y, true))
             {
                 data.index = cellData.index;
-
+                data.owner = CurrentUserManager.Instance.GetCurrentUserId();
                 data.state = cellData.state;
                 int territoryIndex = tgs.CellGetTerritoryIndex(data.index);
 
@@ -291,7 +264,6 @@ public class TerrainGridManager : MonoBehaviour
 
         return data;
     }
-
     public IEnumerator DeleteAllCells()
     {
         UnityWebRequest request = UnityWebRequest.Delete(deleteALL);
@@ -306,8 +278,6 @@ public class TerrainGridManager : MonoBehaviour
             Debug.LogError($"Failed to delete all cells: {request.error}");
         }
     }
-
-
     public int GetProductionSum(ResourceType type)
     {
         int sum = 0;
@@ -327,9 +297,9 @@ public class TerrainGridManager : MonoBehaviour
 
         return sum;
     }
-    public IEnumerator GetCellByIndex(int index)
+    public IEnumerator GetCellByIndex(int cellIndex)
     {
-        string url = "http://127.0.0.1:9090/cell/" + index;
+        string url = $"http://127.0.0.1:9090/world/{CurrentUserManager.Instance.GetCurrentUserId()}/{cellIndex}";
         UnityWebRequest request = UnityWebRequest.Get(url);
         yield return request.SendWebRequest();
 
@@ -354,7 +324,7 @@ public class TerrainGridManager : MonoBehaviour
         UpdateCellData cell = new UpdateCellData();
         cell.state = true;
         cell.level = 1;
- 
+
 
 
 
@@ -366,8 +336,8 @@ public class TerrainGridManager : MonoBehaviour
         yield return request.SendWebRequest();
 
         if (request.result == UnityWebRequest.Result.Success)
-        {    
-            Debug.Log("Cell updated successfully: "+ cellData.index);
+        {
+            Debug.Log("Cell updated successfully: " + cellData.index);
             tgs.CellSetColor(cellData.index, Color.clear);
             tgs.CellFlash(cellData.index, Color.yellow, 2, 3);
             DrawCellLevelUi(cellData);
@@ -377,10 +347,130 @@ public class TerrainGridManager : MonoBehaviour
             Debug.LogError($"Failed to update cell on server: {request.error}");
         }
     }
+    public IEnumerator GetWorldForPlayer()
+    {
+        string url = "http://127.0.0.1:9090/world/" + CurrentUserManager.Instance.GetCurrentUserId();
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                string json = webRequest.downloadHandler.text;
+                dataCells = JsonUtility.FromJson<CellList>(json).cells;
+                LoadGrid();
+            }
+            else
+            {
+                Debug.LogError("Error: " + webRequest.error);
+            }
+        }
+    }
+    public IEnumerator CreateWorld()
+    {
+        string url = "http://127.0.0.1:9090/world/create";
+
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.AddField("player", CurrentUserManager.Instance.GetCurrentUserId());
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody.ToString());
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                string jsonResponse = request.downloadHandler.text;
+                WorldData world = JsonUtility.FromJson<WorldData>(jsonResponse);
+                worldId = world._id;
+            }
+            else
+            {
+                Debug.LogError("Error: " + request.error);
+            }
+        }
+    }
+    public IEnumerator AddCellToWorld(string worldId, string cellId, TerrainCellData data)
+    {
+        string url = "http://127.0.0.1:9090/world/addCell";
+
+        JSONObject jsonBody = new JSONObject();
+        jsonBody.AddField("worldId", worldId);
+        jsonBody.AddField("cellId", cellId);
+
+
+        using (UnityWebRequest request = new UnityWebRequest(url, "POST"))
+        {
+            byte[] bodyRaw = System.Text.Encoding.UTF8.GetBytes(jsonBody.ToString());
+            request.uploadHandler = new UploadHandlerRaw(bodyRaw);
+            request.downloadHandler = new DownloadHandlerBuffer();
+            request.SetRequestHeader("Content-Type", "application/json");
+
+            yield return request.SendWebRequest();
+
+            if (request.result == UnityWebRequest.Result.Success)
+            {
+                Debug.Log("cell added");
+                if (data.index == 58 && data.level == 0)
+                {
+                    StartCoroutine(GetCellByIndex(data.index));
+                }
+                DrawCellLevelUi(data);
+               
+            }
+            else
+            {
+                Debug.LogError("Error: " + request.error);
+            }
+        }
+
+    }
+    public IEnumerator CheckIfPlayerHasWorld()
+    {
+        string url = "http://127.0.0.1:9090/check/" + CurrentUserManager.Instance.GetCurrentUserId();
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                string jsonResponse = webRequest.downloadHandler.text;
+                bool playerHasWorld = bool.Parse(jsonResponse);
+
+                if (playerHasWorld)
+                {
+                    StartCoroutine(GetWorldForPlayer());
+                }
+                else
+                {
+                    StartCoroutine(CreateWorld());
+                    CreateNewTerrain();
+                }
+            }
+            else
+            {
+                Debug.LogError("Error: " + webRequest.error);
+            }
+        }
+    }
 
 }
+
+
 [System.Serializable]
 public class CellList
 {
     public List<TerrainCellData> cells;
+}
+[System.Serializable]
+public class WorldData
+{
+    public string _id;
+    public string player;
 }

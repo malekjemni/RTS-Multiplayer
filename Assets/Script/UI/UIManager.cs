@@ -421,12 +421,10 @@ public class UIManager : MonoBehaviour
             Debug.LogError($"Failed to update cell on server: {request.error}");
         }
     }
-
     public void GetPlayerStorage()
     {
         StartCoroutine(GetPlayerStorageCoroutine());
     }
-
     IEnumerator GetPlayerStorageCoroutine()
     {
         string url = $"http://localhost:9090/getOnce/{CurrentUserManager.Instance.GetCurrentUserId()}";

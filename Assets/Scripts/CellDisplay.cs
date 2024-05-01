@@ -1,6 +1,4 @@
-using System;
 using System.Collections;
-using TGS;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
@@ -18,9 +16,9 @@ public class CellDisplay : MonoBehaviour
 
     public void UpdateCellData(int index)
     {
-        TerrainCellData cell = TerrainGridManager.Instance.GetCellData(index);
-        targetRegion = cell.regionData;      
-        StartCoroutine(GetCellData(cell.index));       
+        TerrainCellData cell = TerrainGridManager.Instance.GetCellData(index);     
+        targetRegion = cell.regionData;
+        StartCoroutine(GetCellFromWorld(CurrentUserManager.Instance.GetCurrentUserId(), cell.index));
     }
 
     public void SetDisplayValue(TerrainCellData cell)
@@ -69,6 +67,26 @@ public class CellDisplay : MonoBehaviour
         }
 
         request.Dispose();
+    }
+    public IEnumerator GetCellFromWorld(string playerId, int cellIndex)
+    {
+        string url = $"http://127.0.0.1:9090/world/{playerId}/{cellIndex}";
+
+        using (UnityWebRequest webRequest = UnityWebRequest.Get(url))
+        {
+            yield return webRequest.SendWebRequest();
+
+            if (webRequest.result == UnityWebRequest.Result.Success)
+            {
+                string responseText = webRequest.downloadHandler.text;
+                currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);
+                SetDisplayValue(currentCell);
+            }
+            else
+            {
+                Debug.LogError("Error: " + webRequest.error);
+            }
+        }
     }
 
     private void UpdateUIWithCellData(TerrainCellData cell)

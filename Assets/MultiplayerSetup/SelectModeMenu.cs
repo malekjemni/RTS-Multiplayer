@@ -102,8 +102,6 @@ public class SelectModeMenu : MonoBehaviour
             }
         }
     }
-
-
     IEnumerator PostAddPlayerToRoom(string roomId, string playerId)
     {
         string url = "http://127.0.0.1:9090/room/addPlayer";
@@ -131,7 +129,6 @@ public class SelectModeMenu : MonoBehaviour
             }
         }
     }
-
     IEnumerator PostRoom(string state)
     {
         string url = "http://127.0.0.1:9090/room/create";
