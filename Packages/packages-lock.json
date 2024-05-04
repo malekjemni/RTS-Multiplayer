@@ -1,5 +1,11 @@
 {
   "dependencies": {
+    "com.unity.2d.sprite": {
+      "version": "1.0.0",
+      "depth": 0,
+      "source": "builtin",
+      "dependencies": {}
+    },
     "com.unity.ai.navigation": {
       "version": "1.1.5",
       "depth": 0,
@@ -211,6 +217,13 @@
         "com.unity.modules.jsonserialize": "1.0.0"
       },
       "url": "https://packages.unity.com"
+    },
+    "com.unscriptedlogic.unscriptedlogiclib": {
+      "version": "https://github.com/UnscriptedLogic/unity-library-UnscriptedLogic.git",
+      "depth": 0,
+      "source": "git",
+      "dependencies": {},
+      "hash": "9a1c69a85b2b388920dbfb4c327d919d51a3fe59"
     },
     "com.unity.modules.ai": {
       "version": "1.0.0",

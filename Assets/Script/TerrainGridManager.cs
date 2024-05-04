@@ -4,6 +4,7 @@ using TGS;
 using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
+using UnityEngine.UI;
 
 public class TerrainGridManager : MonoBehaviour
 {
@@ -22,14 +23,11 @@ public class TerrainGridManager : MonoBehaviour
     private string worldId;
 
     public Transform UiRoot;
-
-
     private void Awake()
     {
         DontDestroyOnLoad(gameObject);
         Instance = this;
     }
-
     private void Start()
     {
         StartCoroutine(CheckIfPlayerHasWorld());
@@ -48,7 +46,6 @@ public class TerrainGridManager : MonoBehaviour
     {
 
         cellDataGrid = new TerrainCellData[tgs.columnCount, tgs.rowCount];
-
         for (int x = 0; x < tgs.columnCount; x++)
         {
             for (int y = 0; y < tgs.rowCount; y++)
@@ -60,8 +57,6 @@ public class TerrainGridManager : MonoBehaviour
                 //  tgs.CellFadeOut(cellDataGrid[x, y].id, UnityEngine.Color.gray, 10, 10);
                 if (!cellDataGrid[x, y].state) { tgs.CellSetMaterial(cellDataGrid[x, y].index, LockMaterial); }
                 // tgs.CellSetVisible(cellDataGrid[x, y].id, true);  
-
-
             }
         }
     }
@@ -106,6 +101,7 @@ public class TerrainGridManager : MonoBehaviour
             TerrainCellData cell = GetCellData(tgs.TerritoryGetCells(i)[0].index);
             cell.state = true;
             cell.level = 1;
+            StartCoroutine(GetCellByIndex(cell.index));
             // cell.regionData.activeCells++;
             // tgs.CellFadeOut(tgs.TerritoryGetCells(i)[0].index, UnityEngine.Color.yellow, 10, 10);
 
@@ -126,19 +122,11 @@ public class TerrainGridManager : MonoBehaviour
     public void OpenNewCell(TerrainCellData cellData)
     {
         int regionIndex = cellData.regionData.index;
-
-
-
         tgs.CellSetColor(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)], Color.clear);
         tgs.CellFlash(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)], Color.yellow, 2, 3);
-
         GetCellData(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index).level = 1;
-
         GetCellData(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index).state = true;
-
         StartCoroutine(GetCellByIndex(tgs.TerritoryGetCells(regionIndex)[ActiveCellsInRegion(regionIndex)].index));
-
-
     }
     private TerrainCellData GenerateCellData(int x, int y)
     {
@@ -205,9 +193,29 @@ public class TerrainGridManager : MonoBehaviour
             Destroy(existingUi.gameObject);
         }
 
-        GameObject cellUi = Instantiate(cellUiPrefab, new Vector3(tgs.CellGetPosition(data.index).x, tgs.CellGetPosition(data.index).y + 3f, tgs.CellGetPosition(data.index).z), Quaternion.identity, UiRoot);
+        GameObject cellUi = Instantiate(cellUiPrefab, new Vector3(tgs.CellGetPosition(data.index).x, 5f, tgs.CellGetPosition(data.index).z), Quaternion.identity, UiRoot);
         cellUi.name = "CellUI_" + data.index;
-        cellUi.GetComponentInChildren<TextMeshProUGUI>().text = data.level.ToString();
+        
+        if(data.level == 0) 
+        {
+            cellUi.transform.Find("Lock").gameObject.SetActive(true);
+        }
+        else
+        {
+            cellUi.GetComponentInChildren<TextMeshProUGUI>().text = data.level.ToString();
+        }
+
+        cellUi.SetActive(false);
+    }
+    public void ShowCellLevel(int index)
+    {
+        Transform existingUi = UiRoot.Find("CellUI_" + index);
+        existingUi.gameObject.SetActive(true);
+    }
+    public void HideCellLevel(int index)
+    {
+        Transform existingUi = UiRoot.Find("CellUI_" + index);
+        existingUi.gameObject.SetActive(false);
     }
     private IEnumerator GetAllCellsInDatabase()
     {
@@ -307,7 +315,7 @@ public class TerrainGridManager : MonoBehaviour
         {
 
             string responseText = request.downloadHandler.text;
-            TerrainCellData currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);
+            TerrainCellData currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);         
             StartCoroutine(UpdateCellDataRequest(currentCell));
         }
         else
@@ -324,10 +332,6 @@ public class TerrainGridManager : MonoBehaviour
         UpdateCellData cell = new UpdateCellData();
         cell.state = true;
         cell.level = 1;
-
-
-
-
         string jsonData = JsonUtility.ToJson(cell);
 
         UnityWebRequest request = UnityWebRequest.Put(url, jsonData);
@@ -337,10 +341,9 @@ public class TerrainGridManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Cell updated successfully: " + cellData.index);
             tgs.CellSetColor(cellData.index, Color.clear);
             tgs.CellFlash(cellData.index, Color.yellow, 2, 3);
-            DrawCellLevelUi(cellData);
+            DrawCellLevelUi(JsonUtility.FromJson<TerrainCellData>(request.downloadHandler.text));           
         }
         else
         {
@@ -415,13 +418,7 @@ public class TerrainGridManager : MonoBehaviour
 
             if (request.result == UnityWebRequest.Result.Success)
             {
-                Debug.Log("cell added");
-                if (data.index == 58 && data.level == 0)
-                {
-                    StartCoroutine(GetCellByIndex(data.index));
-                }
-                DrawCellLevelUi(data);
-               
+               DrawCellLevelUi(data);              
             }
             else
             {
@@ -459,6 +456,8 @@ public class TerrainGridManager : MonoBehaviour
             }
         }
     }
+
+  
 
 }
 

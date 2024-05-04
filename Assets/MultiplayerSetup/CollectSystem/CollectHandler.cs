@@ -3,6 +3,7 @@ using Mirror;
 using UnityEngine.UIElements;
 using System.Collections;
 using UnityEngine.Networking;
+using System;
 
 public class CollectHandler : NetworkBehaviour
 {
@@ -119,23 +120,41 @@ public class CollectHandler : NetworkBehaviour
     IEnumerator GetLootItem(GameObject loot)
     {      
         yield return new WaitForSeconds(4f);
-        if (isOwned)
+        LootItem lootedItem = loot.GetComponentInChildren<LootItem>();
+        lootedItem.PressedLootBox();
+        GetComponent<ChatBehavior>().ShowChatLog("the item " + lootedItem.itemName + " for "+ lootedItem.resourceAmount+ "(" + lootedItem.resourceType+ ")" );
+                      
+        switch (lootedItem.resourceType)
         {
-            loot.GetComponent<LootItem>().PressedLootBox();
-            GetComponent<ChatBehavior>().ShowChatLog("the item " + loot.GetComponent<LootItem>().itemName);
-            if(loot.GetComponent<LootItem>().itemName == "Gold")
-            {
-                GetComponent<LootSceneManager>().EndLootScene();           
-            }
-      
+            case ResourceType.ETypeSolaire:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeSolaire, lootedItem.resourceAmount);
+                break;
+            case ResourceType.Iron:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.Iron, lootedItem.resourceAmount);
+                break;
+            case ResourceType.ETypeWater:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWater, lootedItem.resourceAmount);
+                break;
+            case ResourceType.Mud:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.Mud, lootedItem.resourceAmount);
+                break;
+            case ResourceType.Wood:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.Wood, lootedItem.resourceAmount);
+                break;
+            case ResourceType.ETypeWind:
+                ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWind, lootedItem.resourceAmount);
+                break;
+            default:
+                break;
         }
-        else
-        {
-            if (loot.GetComponent<LootItem>().itemName == "Gold")
+        if (lootedItem.isGolden)
             {
-                GetComponent<LootSceneManager>().EndLootScene();
-            }
-        }
+              
+              ResourceManager.Instance.AddResourceRate(ResourceType.Wood, 20);
+              yield return new WaitForSeconds(3f);
+              GetComponent<LootSceneManager>().EndLootScene();
+             }
+           
         Destroy(loot);
     }
 }

@@ -10,6 +10,8 @@ public class CellDisplay : MonoBehaviour
     public TextMeshProUGUI ProductivityText;
     public TextMeshProUGUI LevelText;
     public TextMeshProUGUI StateText;
+    public GameObject CellDescriptionPanel;
+    public UIManager uiManager;
 
     public TerrainCellData currentCell = null;
     private RegionData targetRegion;
@@ -20,7 +22,6 @@ public class CellDisplay : MonoBehaviour
         targetRegion = cell.regionData;
         StartCoroutine(GetCellFromWorld(CurrentUserManager.Instance.GetCurrentUserId(), cell.index));
     }
-
     public void SetDisplayValue(TerrainCellData cell)
     {
         
@@ -103,5 +104,7 @@ public class CellDisplay : MonoBehaviour
 
         LevelText.text = cell.level.ToString();
         StateText.text = cell.state ? "Active" : "Inactive";
+        CellDescriptionPanel.SetActive(true);
+        uiManager.UpdateCellDescription();
     }
 }

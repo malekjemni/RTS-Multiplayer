@@ -3,16 +3,20 @@ using UnityEngine.SceneManagement;
 
 public class LoadScene : MonoBehaviour
 {
+    public GameObject loginScreen;
+    public GameObject registerScreen;
 
 
     public void LoadRegisterScene()
-    {
-        SceneManager.LoadScene("NewRegister");
+    { 
+        loginScreen.SetActive(false);
+        registerScreen.SetActive(true);
     }
 
     public void LoadLoginScene()
     {
-        SceneManager.LoadScene("NewLogin");
+        loginScreen.SetActive(true);
+        registerScreen.SetActive(false);
     }
 
 }

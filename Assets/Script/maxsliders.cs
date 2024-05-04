@@ -4,22 +4,24 @@ using UnityEngine.UI;
 public class maxsliders : MonoBehaviour
 {
     public static maxsliders Instance;
-    public Slider sliderWood;
-    public Slider sliderIron;
-    public Slider sliderMud;
-    public Slider sliderEnergy;
+    public Image sliderWood;
+    public Image sliderIron;
+    public Image sliderMud;
+    public Image sliderEnergy;
+
 
     private void Awake()
     {
         Instance = this;
     }
-    private void UpdateSliderValue(Slider slider, int currentAmount, int maxCapacity)
+    private void UpdateSliderValue(Image fillImage, int currentAmount, int maxCapacity)
     {
-        slider.value = Mathf.Clamp(currentAmount, 0, maxCapacity);
-        slider.maxValue = maxCapacity;
+        float fillAmount = (float)currentAmount / maxCapacity;
+        fillAmount = Mathf.Clamp01(fillAmount);
+        fillImage.fillAmount = fillAmount;
     }
 
-     void Update()
+    void Update()
     {
     
         UpdateSliderValue(sliderWood, ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Wood), ResourceManager.Instance.MaxCapacityForWood);

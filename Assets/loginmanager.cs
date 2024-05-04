@@ -110,10 +110,11 @@ public class loginmanager : MonoBehaviour
                 if (playerData != null)
                 {
                     LoadedPlayerData = playerData;
-                 
+
 
                     // Load the next scene after retrieving player data
-                    SceneManager.LoadScene("TasskNeder", LoadSceneMode.Single);
+                    //SceneManager.LoadScene("TasskNeder", LoadSceneMode.Single);
+                    SceneController.instance.LoadScene(SceneIndexes.TITLE, MapIndexes.PREVIEW_MAP);
                 }
                 else
                 {
@@ -132,6 +133,7 @@ public class loginmanager : MonoBehaviour
 public class PlayerData
 {
     public string username;
+    public int score;
     public int gold;
     public int storagewood;
     public int storagemud;

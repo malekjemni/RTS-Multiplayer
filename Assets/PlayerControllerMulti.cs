@@ -1,18 +1,11 @@
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
 using Mirror;
-using GameCreator.Runtime.Characters;
 using Cinemachine;
-using GameCreator.Runtime.VisualScripting;
 using System;
 
 public class PlayerControllerMulti : NetworkBehaviour
 {
-    [SerializeField] private Character character; // Référence au GameObject du personnage
     [SerializeField] private CinemachineVirtualCamera playerCamera;
-    [SerializeField] private Trigger trigger;
-
     [SerializeField] private ThirdPersonController controller;
     [SerializeField] private CharacterController cc;
 

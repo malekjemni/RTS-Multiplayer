@@ -44,68 +44,60 @@ public class UIManager : MonoBehaviour
     public TextMeshProUGUI IronRequired;
     public TextMeshProUGUI MudRequired;
     public TextMeshProUGUI EnergeyRequired;
-
     public TextMeshProUGUI Gem;
-
     public TextMeshProUGUI clokTime;
 
+
+    public TMP_Text usernameText;
+
     public int timeElapsed = 0;
-
-
     public GameObject feedbackpos;
     public GameObject feedbackneg;
-
-
     public GameObject Clock;
-
     public CellDisplay cellDisplay;
-
 
     public Button LevelUpButton;
     public Button SkipButton;
-    public Button MoreButton;
+    public Button UpgradeButton;
+
     public GameObject MaxReached;
     public GameObject MaxReachedText;
 
-
-    public GameObject uiTest;
     private bool isUpgradeable = false;
     public StorageUpdateData playerStorageData;
-
+    private int lastHighlightedCellIndex = -1;
 
     private void Start()
     {
         Instance = this;
         GetPlayerStorage();
-       
-        //if (loginmanager.LoadedPlayerData != null)
-        //{
-        //    // Assuming ResourceManager has methods to add resources to storage
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.Wood, loginmanager.LoadedPlayerData.storagewood);
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.Iron, loginmanager.LoadedPlayerData.storageclay); // Assuming clay maps to iron in your model
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.Mud, loginmanager.LoadedPlayerData.storagemud);
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeSolaire, loginmanager.LoadedPlayerData.storageenergie); // You may need to adjust this for your energy resources
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWind, loginmanager.LoadedPlayerData.storageenergie);
-        //    ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWater, loginmanager.LoadedPlayerData.storageenergie);
-        //    // Update UI to reflect the combined total resources
-        //    UpdateUiStorage();
-        //}
+   
 
        
         tgs = TerrainGridSystem.instance;
         UpdateUiStorage();
         UpdateUiProduction();
         tgs.OnCellClick += (grid, cellIndex, buttonIndex) => cellDisplay.UpdateCellData(cellIndex);
-        //tgs.OnCellClick += (grid, cellIndex, buttonIndex) => UpdateCellDescription();
         LevelUpButton.onClick.AddListener(() => IsUpgradeable(cellDisplay.currentCell));
         SkipButton.onClick.AddListener(() => SkipWaiting(cellDisplay.currentCell));
-        MoreButton.onClick.AddListener(() => UpdateCellDescription());
-  
+        UpgradeButton.onClick.AddListener(() => UpdateCellDescription());
+        tgs.OnCellHighlight += OnHoverCell;
 
-        Gem.text = ResourceManager.Instance.Gem.ToString();       
+
+
+        Gem.text = ResourceManager.Instance.Gem.ToString();
+        usernameText.text = CurrentUserManager.Instance.GetCurrentUsername();
     }
 
-
+    private void OnHoverCell(TerrainGridSystem sender, int cellIndex, ref bool cancelHighlight)
+    {
+        if (lastHighlightedCellIndex != -1)
+        {
+            TerrainGridManager.Instance.HideCellLevel(lastHighlightedCellIndex);
+        }
+        TerrainGridManager.Instance.ShowCellLevel(cellIndex);
+        lastHighlightedCellIndex = cellIndex;
+    }
     private void OnEnable()
     {
         TimeManager.OnMinuteChanged += UpdateTime;
@@ -115,7 +107,6 @@ public class UIManager : MonoBehaviour
 
 
     }
-
     private void OnDisable()
     {
 
@@ -125,17 +116,14 @@ public class UIManager : MonoBehaviour
         ResourceManager.OnProductionChange -= UpdateUiProduction;
 
     }
-
     private void UpdateTime()
     {
        // timeText.text = $"{TimeManager.Hour:00}:{TimeManager.Minute:00}";
     }
-
     private void UpdateUiStorage()
-    {
+    {  
         UpdateStorageAttributesOnServer();
     }
-
     private void UpdateUiProduction()
     {
         WoodProduction.text = ResourceManager.Instance.GetResourceAmountProduction(ResourceType.Wood).ToString();
@@ -143,26 +131,14 @@ public class UIManager : MonoBehaviour
         MudProduction.text = ResourceManager.Instance.GetResourceAmountProduction(ResourceType.Mud).ToString();
         int energyValue = ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeSolaire) + ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeWind) + ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeWater);
         EnergieProduction.text = energyValue.ToString();
-        // Debug.Log(TerrainGridManager.Instance.GetProductionSum(ResourceType.Wood));
-
-        //WoodProduction.text = TerrainGridManager.Instance.GetProductionSum(ResourceType.Wood).ToString();
-        //IronProduction.text = TerrainGridManager.Instance.GetProductionSum(ResourceType.Iron).ToString(); ;
-        //MudProduction.text = TerrainGridManager.Instance.GetProductionSum(ResourceType.Mud).ToString();
-        //int energyValue = TerrainGridManager.Instance.GetProductionSum(ResourceType.ETypeSolaire) + TerrainGridManager.Instance.GetProductionSum(ResourceType.ETypeWind) + TerrainGridManager.Instance.GetProductionSum(ResourceType.ETypeWater);
-        //EnergieProduction.text = energyValue.ToString();
-
     }
-
-
-
-
-    void UpdateCellDescription()
+    public void UpdateCellDescription()
     {
-        
         if (cellDisplay.currentCell.level == 5)
         {
             MaxReached.SetActive(false);
             MaxReachedText.SetActive(true);
+            LevelUpButton.gameObject.SetActive(false);
         }
         else
         {
@@ -180,9 +156,6 @@ public class UIManager : MonoBehaviour
         EnergeyRequired.text = cellDisplay.currentCell.materialsNeeded[3].ToString();
 
     }
-
-
-
     public void IsUpgradeable(TerrainCellData cell)
     {
         int woodReserve = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Wood);
@@ -195,7 +168,7 @@ public class UIManager : MonoBehaviour
         if (cell.materialsNeeded[0] < woodReserve 
             && cell.materialsNeeded[1] < ironReserve 
             && cell.materialsNeeded[2] < mudReserve 
-            && cell.materialsNeeded[3] < loginmanager.LoadedPlayerData.storageenergie)
+            && cell.materialsNeeded[3] < playerStorageData.storageenergie)
         {        
             upgrade(cell);         
         }
@@ -206,7 +179,6 @@ public class UIManager : MonoBehaviour
 
 
     }
-
     public void UpgradeRoutine(TerrainCellData cell)
     {
         cell.CalculateMaterialsNeededForNextUpgrade();
@@ -232,9 +204,8 @@ public class UIManager : MonoBehaviour
         UpdateCellDescription();
         UpdateUiStorage();
         TerrainGridManager.Instance.DrawCellLevelUi(cellDisplay.currentCell);
-        StartCoroutine(UpdateCellDataRequest(cellDisplay.currentCell._id, cell.level));
+        StartCoroutine(UpdateCellDataRequest(cellDisplay.currentCell._id, cell.level));       
     }
-
     public void upgrade(TerrainCellData cell)
     {
         Debug.Log(cell._id);
@@ -259,17 +230,12 @@ public class UIManager : MonoBehaviour
         }
 
     }
-
     IEnumerator feedbackOn(GameObject go)
     {
         go.SetActive(true);
         yield return new WaitForSeconds(2f);
         go.SetActive(false);
     }
-
-
-
-
     IEnumerator TimerOn(TerrainCellData cell)
     {
         int timetowait = cell.level * 30;
@@ -300,7 +266,6 @@ public class UIManager : MonoBehaviour
         Clock.SetActive(false);
         LevelUpButton.gameObject.SetActive(true);
     }
-
     public void SkipWaiting(TerrainCellData cell)
     {
         if (!cell.canUpgrade)
@@ -316,15 +281,9 @@ public class UIManager : MonoBehaviour
             cellDisplay.UpdateCellData(cellDisplay.currentCell.index);
         }
     }
-
     public void UpdateStorageAttributesOnServer()
     {
-        // Ensure you have a method to get the username correctly
-        string username = loginmanager.LoadedPlayerData.username;
-        
-
-
-
+ 
         StorageUpdateData data = new StorageUpdateData
         {
             storagewood = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Wood),
@@ -339,9 +298,8 @@ public class UIManager : MonoBehaviour
         MudStorage.text = data.storagemud.ToString();
         EnergieStorage.text = data.storageenergie.ToString();
 
-        StartCoroutine(UpdateStorageAttributesCoroutine(username, JsonUtility.ToJson(data)));
+        StartCoroutine(UpdateStorageAttributesCoroutine(CurrentUserManager.Instance.GetCurrentUsername(), JsonUtility.ToJson(data)));   
     }
-
     IEnumerator UpdateStorageAttributesCoroutine(string username, string jsonData)
     {
         string url = $"http://localhost:9090/players/{username}";
@@ -352,7 +310,14 @@ public class UIManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Storage attributes updated successfully: " + request.downloadHandler.text);
+            string json = request.downloadHandler.text;
+            StorageUpdateData res = JsonUtility.FromJson<StorageUpdateData>(json);
+
+            playerStorageData.storagewood = res.storagewood;
+            playerStorageData.storageclay = res.storageclay;
+            playerStorageData.storagemud = res.storagemud;
+            playerStorageData.storageenergie = res.storageenergie;
+
         }
         else
         {
@@ -364,7 +329,6 @@ public class UIManager : MonoBehaviour
         string username = loginmanager.LoadedPlayerData.username; 
         StartCoroutine(UpdateGoldCoroutine(username, goldChange));
     }
-
     IEnumerator UpdateGoldCoroutine(string username, int goldChange)
     {
         string url = $"http://localhost:9090/players/{username}";
@@ -387,7 +351,6 @@ public class UIManager : MonoBehaviour
             Debug.LogError($"Failed to update gold on server: {request.error}");
         }
     }
-
     IEnumerator UpdateCellDataRequest(string cellId,int _level)
     {
         Debug.Log("id : " + cellId + "level" + _level);
@@ -397,9 +360,6 @@ public class UIManager : MonoBehaviour
         cell.level = _level;
         cell.state = cellDisplay.currentCell.state;
         cell.productivite = cellDisplay.currentCell.regionData.productionRateBase * _level;
-
-
-
 
         string jsonData = JsonUtility.ToJson(cell);
 
@@ -412,9 +372,9 @@ public class UIManager : MonoBehaviour
         {
             if(_level == 5)
             {
-                cellDisplay.UpdateCellData(cellDisplay.currentCell.index);
+                cellDisplay.UpdateCellData(cellDisplay.currentCell.index);              
             }
-            Debug.Log("Gold updated successfully on server.");         
+            StartCoroutine(GetPlayerScore());        
         }
         else
         {
@@ -424,6 +384,7 @@ public class UIManager : MonoBehaviour
     public void GetPlayerStorage()
     {
         StartCoroutine(GetPlayerStorageCoroutine());
+      
     }
     IEnumerator GetPlayerStorageCoroutine()
     {
@@ -436,14 +397,53 @@ public class UIManager : MonoBehaviour
         {
             string json = request.downloadHandler.text;
             playerStorageData = JsonUtility.FromJson<StorageUpdateData>(json);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.Wood, playerStorageData.storagewood);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.Iron, playerStorageData.storageclay);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.Mud, playerStorageData.storagemud);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeSolaire, playerStorageData.storageenergie);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeWind, playerStorageData.storageenergie);
+            ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeWater, playerStorageData.storageenergie);
+        }
+        else
+        {
+            Debug.LogError("Failed to retrieve storage data: " + request.error);
+        }
+    }
+    IEnumerator UpdatePlayerScore(int score)
+    {
+        string url = $"http://localhost:9090/players/{CurrentUserManager.Instance.GetCurrentUsername()}";
+        PlayerDataScore playerData = new PlayerDataScore();
+        playerData.score = loginmanager.LoadedPlayerData.score + score;
 
-            ResourceManager.Instance.AddResourceStorage(ResourceType.Wood, playerStorageData.storagewood);
-            ResourceManager.Instance.AddResourceStorage(ResourceType.Iron, playerStorageData.storageclay);
-            ResourceManager.Instance.AddResourceStorage(ResourceType.Mud, playerStorageData.storagemud);
-            ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeSolaire, playerStorageData.storageenergie);
-            ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWind, playerStorageData.storageenergie);
-            ResourceManager.Instance.AddResourceStorage(ResourceType.ETypeWater, playerStorageData.storageenergie);
 
+        string jsonData = JsonUtility.ToJson(playerData);
+
+        UnityWebRequest request = UnityWebRequest.Put(url, jsonData);
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            Debug.Log("Score updated successfully on server.");
+        }
+        else
+        {
+            Debug.LogError($"Failed to update Score on server: {request.error}");
+        }
+    }
+    IEnumerator GetPlayerScore()
+    {
+        string url = $"http://localhost:9090/getOnce/{CurrentUserManager.Instance.GetCurrentUserId()}";
+        UnityWebRequest request = UnityWebRequest.Get(url);
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string json = request.downloadHandler.text;
+            loginmanager.LoadedPlayerData.score = JsonUtility.FromJson<PlayerData>(json).score;
+            StartCoroutine(UpdatePlayerScore(1));
         }
         else
         {
@@ -451,9 +451,27 @@ public class UIManager : MonoBehaviour
         }
     }
 
+    public void KeepStorageCheckOnServer()
+    {
+        StartCoroutine(KeepStorageCheck());
+    }
+    IEnumerator KeepStorageCheck()
+    {
+        string url = $"http://localhost:9090/getOnce/{CurrentUserManager.Instance.GetCurrentUserId()}";
+        UnityWebRequest request = UnityWebRequest.Get(url);
 
+        yield return request.SendWebRequest();
 
-
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string json = request.downloadHandler.text;
+            playerStorageData = JsonUtility.FromJson<StorageUpdateData>(json);
+        }
+        else
+        {
+            Debug.LogError("Failed to retrieve storage data: " + request.error);
+        }
+    }
 }
 [System.Serializable]
 public class StorageUpdateData
@@ -474,4 +492,9 @@ public class UpdateCellData
 public class UpdatePlayerData
 {
     public int gold;
+}
+[System.Serializable]
+public class PlayerDataScore
+{
+    public int score;
 }

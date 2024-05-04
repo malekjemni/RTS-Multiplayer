@@ -1,0 +1,115 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: f5237aa77b53d524cb49ad737e8e2f12, type: 3}
+  m_Name: Global Sound List
+  m_EditorClassIdentifier: 
+  ruins:
+    mainscreenTheme:
+      audioSettings:
+        clip: {fileID: 8300000, guid: fdcdf78c76cd98146b5c096b9c329514, type: 3}
+        volume: 1
+        audioType: 2
+        pitch: 0.59
+        spatialBlend: 0
+        looping: 1
+      effectSettings:
+        effectPrefab: {fileID: 0}
+        lifetime: 0
+    proceedClick:
+      audioSettings:
+        clip: {fileID: 0}
+        volume: 0.5
+        audioType: 2
+        pitch: 1
+        spatialBlend: 0
+        looping: 0
+      effectSettings:
+        effectPrefab: {fileID: 0}
+        lifetime: 0
+    gameAtmosphere:
+      audioSettings:
+        clip: {fileID: 8300000, guid: 61c41e03d6593cc4994d2ab4a8e99165, type: 3}
+        volume: 0.5
+        audioType: 2
+        pitch: 1
+        spatialBlend: 0
+        looping: 1
+      effectSettings:
+        effectPrefab: {fileID: 0}
+        lifetime: 0
+  levelUp:
+    audioSettings:
+      clip: {fileID: 8300000, guid: bc7c293979932e44a944efcaa69d773b, type: 3}
+      volume: 1
+      audioType: 2
+      pitch: 1
+      spatialBlend: 1
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 1027995726539321422, guid: 42b05cdeb882b304ca78e555251f7894,
+        type: 3}
+      lifetime: 0
+  crit:
+    audioSettings:
+      clip: {fileID: 8300000, guid: 8e414cd1049dd2b478a954182a932e5a, type: 3}
+      volume: 0.05
+      audioType: 2
+      pitch: 1
+      spatialBlend: 1
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 8460747976295487, guid: 9b3fc476b21f2914bb92fe0ce7bdf46b,
+        type: 3}
+      lifetime: 2
+  towerPlace:
+    audioSettings:
+      clip: {fileID: 8300000, guid: 2f55a3f2257916f47a9af9b631ceadb3, type: 3}
+      volume: 1
+      audioType: 2
+      pitch: 1
+      spatialBlend: 1
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 1334071670866236, guid: edf12e91890b8434eb8ea701f9bc40a2,
+        type: 3}
+      lifetime: 2
+  upgradeBoughts:
+  - audioSettings:
+      clip: {fileID: 8300000, guid: 0e1a1506f125e414ab50dde3fa9e106a, type: 3}
+      volume: 0.5
+      audioType: 2
+      pitch: 1
+      spatialBlend: 0
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 0}
+      lifetime: 0
+  - audioSettings:
+      clip: {fileID: 8300000, guid: b12a8050ac7f7b947ba2a99e96bb30f9, type: 3}
+      volume: 0.5
+      audioType: 2
+      pitch: 1
+      spatialBlend: 0
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 0}
+      lifetime: 0
+  - audioSettings:
+      clip: {fileID: 8300000, guid: ab0c48fbac45adc46bfa02727ae8830e, type: 3}
+      volume: 0.5
+      audioType: 2
+      pitch: 1
+      spatialBlend: 0
+      looping: 0
+    effectSettings:
+      effectPrefab: {fileID: 0}
+      lifetime: 0
