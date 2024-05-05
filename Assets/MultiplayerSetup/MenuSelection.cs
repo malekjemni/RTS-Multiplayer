@@ -1,3 +1,4 @@
+using RtsCam;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -7,8 +8,10 @@ using UnityEngine.Networking;
 public class MenuSelection : MonoBehaviour
 {
     public GameObject leaderBoardView;
+    public GameObject menuGroup;
     public GameObject playerEntryPrefab;
     public Transform contentParent;
+
 
     public void QuitGame() => Application.Quit();
     public void ShowLeaderBoard() => StartCoroutine(GetLeaderboard());
@@ -34,6 +37,7 @@ public class MenuSelection : MonoBehaviour
     }
     public void LoadLeaderboard(List<PlayerData> playerList)
     {
+        menuGroup.SetActive(false);
         leaderBoardView.SetActive(true);
         foreach (Transform child in contentParent)
         {

@@ -53,6 +53,6 @@ public class RegisterGame : MonoBehaviour
             // Traiter la réponse du serveur si nécessaire
         }
 
-        SceneManager.LoadScene("NewLogin");
+        SceneController.instance.LoadScene(SceneIndexes.LOGIN, MapIndexes.PREVIEW_MAP);
     }
 }

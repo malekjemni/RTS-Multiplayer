@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using TMPro;
 using UnityEngine;
@@ -19,7 +20,7 @@ public class CellDisplay : MonoBehaviour
     public void UpdateCellData(int index)
     {
         TerrainCellData cell = TerrainGridManager.Instance.GetCellData(index);     
-        targetRegion = cell.regionData;
+        targetRegion = cell.regionData;    
         StartCoroutine(GetCellFromWorld(CurrentUserManager.Instance.GetCurrentUserId(), cell.index));
     }
     public void SetDisplayValue(TerrainCellData cell)
@@ -36,11 +37,17 @@ public class CellDisplay : MonoBehaviour
                 if(cell.level == 0)
                 {
                     cell.productivite = cell.regionData.productionRateBase;
-                }
+                }      
                 else
                 {
                     cell.productivite = cell.regionData.productionRateBase * cell.level;
                 }
+
+                if (cell.level >= 5)
+                {
+                    cell.canUpgrade = false;    
+                }
+
                 UpdateUIWithCellData(cell);              
             }
             else
@@ -59,7 +66,7 @@ public class CellDisplay : MonoBehaviour
         {
     
             string responseText = request.downloadHandler.text;
-            currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);
+            currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);         
             SetDisplayValue(currentCell);
         }
         else
@@ -81,6 +88,8 @@ public class CellDisplay : MonoBehaviour
             {
                 string responseText = webRequest.downloadHandler.text;
                 currentCell = JsonUtility.FromJson<TerrainCellData>(responseText);
+                TerrainCellData cell = TerrainGridManager.Instance.GetCellData(cellIndex);
+                currentCell.canUpgrade = TerrainGridManager.Instance.GetCanUpgradeForCell(cell);
                 SetDisplayValue(currentCell);
             }
             else
@@ -100,11 +109,11 @@ public class CellDisplay : MonoBehaviour
         {
             ProductivityText.text = (cell.regionData.productionRateBase * cell.level).ToString();
         }
-       
 
+        RegionText.text = cell.region;
         LevelText.text = cell.level.ToString();
         StateText.text = cell.state ? "Active" : "Inactive";
         CellDescriptionPanel.SetActive(true);
-        uiManager.UpdateCellDescription();
+        uiManager.UpdateCellDescription(cell);
     }
 }

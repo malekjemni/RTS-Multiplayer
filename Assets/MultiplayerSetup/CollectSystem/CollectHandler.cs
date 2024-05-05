@@ -147,14 +147,47 @@ public class CollectHandler : NetworkBehaviour
             default:
                 break;
         }
+        UpdateStorageAttributesOnServer();
         if (lootedItem.isGolden)
-            {
-              
-              ResourceManager.Instance.AddResourceRate(ResourceType.Wood, 20);
+            {             
               yield return new WaitForSeconds(3f);
               GetComponent<LootSceneManager>().EndLootScene();
              }
            
         Destroy(loot);
+    }
+
+
+    public void UpdateStorageAttributesOnServer()
+    {
+        StorageUpdateData data = new StorageUpdateData
+        {
+            storagewood = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Wood),
+            storagemud = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Mud),
+            storageclay = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.Iron),
+            storageenergie = ResourceManager.Instance.GetResourceAmountStorage(ResourceType.ETypeSolaire)
+                           + ResourceManager.Instance.GetResourceAmountStorage(ResourceType.ETypeWind)
+                           + ResourceManager.Instance.GetResourceAmountStorage(ResourceType.ETypeWater)
+        };
+
+        StartCoroutine(UpdateStorageAttributesCoroutine(JsonUtility.ToJson(data)));
+    }
+    IEnumerator UpdateStorageAttributesCoroutine(string jsonData)
+    {
+        string url = $"http://localhost:9090/players/{CurrentUserManager.Instance.GetCurrentUsername()}";
+        UnityWebRequest request = UnityWebRequest.Put(url, jsonData);
+        request.SetRequestHeader("Content-Type", "application/json");
+
+        yield return request.SendWebRequest();
+
+        if (request.result == UnityWebRequest.Result.Success)
+        {
+            string json = request.downloadHandler.text;
+            Debug.Log(json);
+        }
+        else
+        {
+            Debug.LogError("Failed to update storage attributes: " + request.error);
+        }
     }
 }

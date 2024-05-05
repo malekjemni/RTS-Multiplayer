@@ -106,7 +106,7 @@ public class ResourceManager : MonoBehaviour
         if (resourceAmounts.ContainsKey(type) && maxResourceAmounts.ContainsKey(type))
         {
             int maxAmount = maxResourceAmounts[type];
-
+            
             // Check if adding the amount would exceed the maximum allowed value
             if (resourceAmounts[type] + amount <= maxAmount)
             {

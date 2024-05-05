@@ -18,7 +18,7 @@ public class TerrainGridManager : MonoBehaviour
     private const string createCellUrl = "http://127.0.0.1:9090/cell/create";
     private const string getCellsUrl = "http://127.0.0.1:9090/cells";
     private const string deleteALL = "http://127.0.0.1:9090/clear";
-    private List<TerrainCellData> dataCells;
+    public List<TerrainCellData> dataCells;
     private List<string> cellIds = new List<string>();
     private string worldId;
 
@@ -178,7 +178,7 @@ public class TerrainGridManager : MonoBehaviour
         if (request.result == UnityWebRequest.Result.Success)
         {
             StartCoroutine(AddCellToWorld(worldId, JsonUtility.FromJson<TerrainCellData>(request.downloadHandler.text)._id,data));
-          
+            dataCells.Add(JsonUtility.FromJson<TerrainCellData>(request.downloadHandler.text));
         }
         else
         {
@@ -457,7 +457,18 @@ public class TerrainGridManager : MonoBehaviour
         }
     }
 
-  
+    public void SetCanUpgradeForCell(TerrainCellData cell, bool newValue)
+    {
+       
+        int index = dataCells.FindIndex(c => c.index == cell.index);
+        dataCells[index].canUpgrade = newValue;
+    }
+    public bool GetCanUpgradeForCell(TerrainCellData cell)
+    {
+        int index = dataCells.FindIndex(c => c.index == cell.index);
+        return dataCells[index].canUpgrade;
+    }
+
 
 }
 

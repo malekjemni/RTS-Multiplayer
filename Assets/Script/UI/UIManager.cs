@@ -5,6 +5,7 @@ using System;
 using UnityEngine.UI;
 using System.Collections;
 using UnityEngine.Networking;
+using UnscriptedLogic.Experimental.Generation;
 
 public class UIManager : MonoBehaviour
 {
@@ -67,6 +68,9 @@ public class UIManager : MonoBehaviour
     public StorageUpdateData playerStorageData;
     private int lastHighlightedCellIndex = -1;
 
+
+    private TerrainCellData cellToLevel;
+
     private void Start()
     {
         Instance = this;
@@ -79,8 +83,7 @@ public class UIManager : MonoBehaviour
         UpdateUiProduction();
         tgs.OnCellClick += (grid, cellIndex, buttonIndex) => cellDisplay.UpdateCellData(cellIndex);
         LevelUpButton.onClick.AddListener(() => IsUpgradeable(cellDisplay.currentCell));
-        SkipButton.onClick.AddListener(() => SkipWaiting(cellDisplay.currentCell));
-        UpgradeButton.onClick.AddListener(() => UpdateCellDescription());
+
         tgs.OnCellHighlight += OnHoverCell;
 
 
@@ -132,28 +135,33 @@ public class UIManager : MonoBehaviour
         int energyValue = ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeSolaire) + ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeWind) + ResourceManager.Instance.GetResourceAmountProduction(ResourceType.ETypeWater);
         EnergieProduction.text = energyValue.ToString();
     }
-    public void UpdateCellDescription()
+    public void UpdateCellDescription(TerrainCellData cell)
     {
-        if (cellDisplay.currentCell.level == 5)
+        if (cell.level >= 5)
         {
             MaxReached.SetActive(false);
             MaxReachedText.SetActive(true);
-            LevelUpButton.gameObject.SetActive(false);
         }
-        else
+        else 
         {
             MaxReached.SetActive(true);
-            MaxReachedText.SetActive(false);    
+            MaxReachedText.SetActive(false);           
+        }
+        if(!cell.canUpgrade)
+        {
+            LevelUpButton.gameObject.SetActive(false);
+        }
+        else if(!Clock.activeInHierarchy)
+        {
+            LevelUpButton.gameObject.SetActive(true);
         }
 
-        // cellDisplay.UpdateCellData(cellDisplay.currentCell.index);
-        //updateCell(cellDisplay.currentCell.index);
-        cellDisplay.currentCell.CalculateMaterialsNeededForNextUpgrade();
-        cellDescription.text = cellDisplay.currentCell.regionData.RegionDescription;
-        woodRequired.text = cellDisplay.currentCell.materialsNeeded[0].ToString();
-        IronRequired.text = cellDisplay.currentCell.materialsNeeded[1].ToString();
-        MudRequired.text = cellDisplay.currentCell.materialsNeeded[2].ToString();
-        EnergeyRequired.text = cellDisplay.currentCell.materialsNeeded[3].ToString();
+        cell.CalculateMaterialsNeededForNextUpgrade();
+        cellDescription.text = cell.regionData.RegionDescription;
+        woodRequired.text = cell.materialsNeeded[0].ToString();
+        IronRequired.text = cell.materialsNeeded[1].ToString();
+        MudRequired.text = cell.materialsNeeded[2].ToString();
+        EnergeyRequired.text = cell.materialsNeeded[3].ToString();
 
     }
     public void IsUpgradeable(TerrainCellData cell)
@@ -169,8 +177,9 @@ public class UIManager : MonoBehaviour
             && cell.materialsNeeded[1] < ironReserve 
             && cell.materialsNeeded[2] < mudReserve 
             && cell.materialsNeeded[3] < playerStorageData.storageenergie)
-        {        
-            upgrade(cell);         
+        {   
+            cellToLevel = cell;
+            upgrade(cellToLevel);         
         }
         else
         {
@@ -187,7 +196,13 @@ public class UIManager : MonoBehaviour
         ResourceManager.Instance.SubtractResourceStorage(ResourceType.Mud, cell.materialsNeeded[2]);
         ResourceManager.Instance.SubtractResourceStorage(ResourceType.ETypeSolaire, cell.materialsNeeded[3]);
         cell.level++;
-        
+
+        if (cell.level >= 5)
+        {
+            TerrainGridManager.Instance.OpenNewCell(cell);
+            TerrainGridManager.Instance.ActiveCellsInRegion(cell.regionData.index);
+        }
+
         StartCoroutine(feedbackOn(feedbackpos));
         if (cell.regionData.resourceType == ResourceType.Wood
             || cell.regionData.resourceType == ResourceType.Mud
@@ -197,32 +212,20 @@ public class UIManager : MonoBehaviour
         }
         else
         {
-
-
             ResourceManager.Instance.AddResourceRate(ResourceType.ETypeSolaire, cell.regionData.productionRateBase);
-        }
-        UpdateCellDescription();
+        }      
+        StartCoroutine(UpdateCellDataRequest(cell._id, cell.level));
+        TerrainGridManager.Instance.DrawCellLevelUi(cell);
+        TerrainGridManager.Instance.SetCanUpgradeForCell(cell, true);
+        cellDisplay.UpdateCellData(cellDisplay.currentCell.index);      
         UpdateUiStorage();
-        TerrainGridManager.Instance.DrawCellLevelUi(cellDisplay.currentCell);
-        StartCoroutine(UpdateCellDataRequest(cellDisplay.currentCell._id, cell.level));       
+        cellToLevel = null;
     }
     public void upgrade(TerrainCellData cell)
     {
-        Debug.Log(cell._id);
-        if (cell.state && cell.level <= 5 && cell.canUpgrade)
-        {          
-            if (cell.level == 4)
-            {
-                UpgradeRoutine(cell);
-                TerrainGridManager.Instance.OpenNewCell(cell);
-                TerrainGridManager.Instance.ActiveCellsInRegion(cell.regionData.index);
-            }
-            else
-            {
-                UpgradeRoutine(cell);              
-                StartCoroutine(TimerOn(cell));
-                cell.canUpgrade = false;
-            }
+        if (cell.state && cell.level <= 5 && TerrainGridManager.Instance.GetCanUpgradeForCell(cell))
+        {
+            StartCoroutine(TimerOn(cell));          
         }
         else
         {
@@ -238,9 +241,13 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator TimerOn(TerrainCellData cell)
     {
+        Debug.Log("TimerOn");
         int timetowait = cell.level * 30;
+        TerrainGridManager.Instance.SetCanUpgradeForCell(cell, false);
         LevelUpButton.gameObject.SetActive(false);
         Clock.SetActive(true);
+        SkipButton.interactable = true;
+       
 
         while (timeElapsed < timetowait)
         {
@@ -261,25 +268,23 @@ public class UIManager : MonoBehaviour
             }
         }
 
-        timeElapsed = 0;
-        cell.canUpgrade = true;
+        timeElapsed = 0;       
         Clock.SetActive(false);
+        SkipButton.interactable = false;
         LevelUpButton.gameObject.SetActive(true);
+        UpgradeRoutine(cell);
     }
-    public void SkipWaiting(TerrainCellData cell)
+    public void SkipWaiting()
     {
-        if (!cell.canUpgrade)
+        if (cellToLevel.index == cellDisplay.currentCell.index)
         {
-            StopCoroutine("TimerOn"); // Stop the coroutine
-            timeElapsed = cell.level * 30; // Set timeElapsed to its maximum value
-            cell.canUpgrade = true; // Set canUpgrade to true to enable upgrading
-            Clock.SetActive(false); // Hide the clock
-            LevelUpButton.gameObject.SetActive(true); // Show the LevelUpButton
+            StopCoroutine("TimerOn");
+            timeElapsed = cellToLevel.level * 30;
             ResourceManager.Instance.Gem -= 50;
-            UpdateGoldOnServer(50);// Assuming you deduct 50 gems for skipping
+            UpdateGoldOnServer(50);
             Gem.text = ResourceManager.Instance.Gem.ToString();
-            cellDisplay.UpdateCellData(cellDisplay.currentCell.index);
         }
+                  
     }
     public void UpdateStorageAttributesOnServer()
     {

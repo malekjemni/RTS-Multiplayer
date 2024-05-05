@@ -2241,7 +2241,7 @@ MonoBehaviour:
   m_OnCullStateChanged:
     m_PersistentCalls:
       m_Calls: []
-  m_text: ESM EL GAME
+  m_text: Empire Of the future energy
   m_isRightToLeft: 0
   m_fontAsset: {fileID: 11400000, guid: b04760c275d86fc45ba21d7d8be5b5dd, type: 2}
   m_sharedMaterial: {fileID: 5029177331180816720, guid: b04760c275d86fc45ba21d7d8be5b5dd, type: 2}
@@ -2268,7 +2268,7 @@ MonoBehaviour:
   m_faceColor:
     serializedVersion: 2
     rgba: 4294967295
-  m_fontSize: 56
+  m_fontSize: 31.2
   m_fontSizeBase: 36
   m_fontWeight: 400
   m_enableAutoSizing: 1

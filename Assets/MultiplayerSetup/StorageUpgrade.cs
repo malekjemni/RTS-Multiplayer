@@ -1,3 +1,4 @@
+using RtsCam;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -9,10 +10,23 @@ public class StorageUpgrade : MonoBehaviour
     public GameObject ironStorageUp;
     public GameObject mudStorageUp;
     public GameObject energieStorageUp;
-
     public UIManager uiManager;
+    public GameObject uiElement;
+    public RtsCamera rtsCamera;
 
-
+    public void ToggleUIElement()
+    {
+        if (uiElement.activeSelf)
+        {
+            uiElement.SetActive(false);
+            rtsCamera.enabled = true;
+        }
+        else
+        {
+            uiElement.SetActive(true);
+            rtsCamera.enabled = false;
+        }
+    }
     private void Update()
     {
         if (ResourceManager.Instance.MaxCapacityForWood <= uiManager.playerStorageData.storagewood)
