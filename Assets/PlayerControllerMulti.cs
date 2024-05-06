@@ -50,6 +50,7 @@ public class PlayerControllerMulti : NetworkBehaviour
         GetComponent<ChatBehavior>().chatText = chat.GetComponent<ChatPopup>().chatText;
         GetComponent<ChatBehavior>().inputField = chat.GetComponent<ChatPopup>().inputField;
         GetComponent<ChatBehavior>().chatButton = chat.GetComponent<ChatPopup>().openChat;
+        GetComponent<ChatBehavior>().thirdPersonController = controller;
         GetComponent<ChatBehavior>().chatButton.onClick.AddListener(delegate { GetComponent<ChatBehavior>().Send(); });
 
 

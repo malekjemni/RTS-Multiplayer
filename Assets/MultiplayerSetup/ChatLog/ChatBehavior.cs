@@ -2,6 +2,7 @@ using Mirror;
 using System;
 using TMPro;
 using UnityEngine;
+using UnityEngine.InputSystem;
 using UnityEngine.UI;
 
 
@@ -11,11 +12,33 @@ public class ChatBehavior : NetworkBehaviour
      public TextMeshProUGUI chatText = null;
      public TMP_InputField inputField = null;
      public Button chatButton = null;
-
+     public ThirdPersonController thirdPersonController;
 
     private static event Action<string> OnMessage;
     private static event Action<string> OnTimeChange;
 
+    private bool isTyping = false;
+
+    private void Update()
+    {
+        if (inputField.isFocused && Input.anyKeyDown)
+        {
+            isTyping = true;
+            thirdPersonController.enabled = false;
+            Debug.Log("Typing");    
+        }
+        else
+        {
+            thirdPersonController.enabled = true;
+            Debug.Log("Not Typing");
+            isTyping = false;
+        }
+
+        if (Input.GetKeyDown(KeyCode.Return) && !isTyping)
+        {
+            Send();
+        }
+    }
     public override void OnStartAuthority()
     {
         OnMessage += HandleNewMessage;

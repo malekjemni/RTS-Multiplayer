@@ -55,7 +55,7 @@ public class TerrainGridManager : MonoBehaviour
                 cellDataGrid[x, y] = GenerateCellData(x, y);
                 //  tgs.CellSetColor(cellDataGrid[x, y].id,UnityEngine.Color.gray);
                 //  tgs.CellFadeOut(cellDataGrid[x, y].id, UnityEngine.Color.gray, 10, 10);
-                if (!cellDataGrid[x, y].state) { tgs.CellSetMaterial(cellDataGrid[x, y].index, LockMaterial); }
+               if (!cellDataGrid[x, y].state) { tgs.CellSetMaterial(cellDataGrid[x, y].index, LockMaterial); }
                 // tgs.CellSetVisible(cellDataGrid[x, y].id, true);  
             }
         }
@@ -112,9 +112,10 @@ public class TerrainGridManager : MonoBehaviour
         int counter = 0;
         for (int i = 0; i < tgs.TerritoryGetCells(index).Count; i++)
         {
-            if (GetCellData(tgs.TerritoryGetCells(index)[i].index).state == true)
+            if (GetCellData(tgs.TerritoryGetCells(index)[i].index).state == false)
             {
-                counter++;
+                counter = i;
+                break;
             };
         }
         return counter;

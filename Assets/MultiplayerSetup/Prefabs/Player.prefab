@@ -218,9 +218,7 @@ MonoBehaviour:
   syncDirection: 0
   syncMode: 0
   syncInterval: 0
-  character: {fileID: 0}
   playerCamera: {fileID: 7796924328211009778}
-  trigger: {fileID: 0}
   controller: {fileID: 5149116663232552935}
   cc: {fileID: 4372688192397911310}
   UiPrefab: {fileID: 7565453863102321008, guid: 911deda3e5e4e3449ba678a522dc3133, type: 3}
@@ -393,6 +391,7 @@ MonoBehaviour:
   chatText: {fileID: 0}
   inputField: {fileID: 0}
   chatButton: {fileID: 0}
+  thirdPersonController: {fileID: 0}
 --- !u!114 &4839104737599849789
 MonoBehaviour:
   m_ObjectHideFlags: 0
@@ -409,7 +408,6 @@ MonoBehaviour:
   syncMode: 0
   syncInterval: 0
   countDownTimerUi: {fileID: 0}
-  timeText: {fileID: 0}
 --- !u!1 &913530650339087258
 GameObject:
   m_ObjectHideFlags: 0

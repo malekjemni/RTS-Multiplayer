@@ -6,56 +6,56 @@ using UnityEngine.Networking;
 
 public class SelectModeMenu : MonoBehaviour
 {
-    public GameObject canva;
     private bool isHostStarted = false;
     public GameObject lootScene;
     public TimerUi timerUi;
+    public GameObject menu;
+    public GameObject hideOut;
 
     private bool isCreated = false;
     private string roomId;
-    public void CreateNewTerrain()
-    {
-        canva.SetActive(false);
-        StartCoroutine(WaitForTerrainGridManagerToInitialize(() =>
-        {
-            TerrainGridManager.Instance.CreateNewTerrain();
-        }));
-    }
-    public void LoadTerrain()
-    {
-        canva.SetActive(false);
-        StartCoroutine(WaitForTerrainGridManagerToInitialize(() =>
-        {
-            TerrainGridManager.Instance.LoadTerrain();
-        }));
-    }
+
     public void StartLootScene()
     {
         StartCoroutine(GetRoomsAndAddPlayer());
         lootScene.SetActive(false);
     }
-
-    private IEnumerator WaitForTerrainGridManagerToInitialize(System.Action action)
+    public void DeclineLootScene()
     {
-        while (TerrainGridManager.Instance == null)
-        {
-            yield return null;
-        }
-        action.Invoke();
+        isCreated = false;
+        lootScene.SetActive(false);
     }
-    private void Update()
+
+    void Update()
     {
-        if ((timerUi.timerString.Equals("00:30") ||
-      timerUi.timerString.Equals("05:00") ||
-      timerUi.timerString.Equals("10:00") ||
-      timerUi.timerString.Equals("15:00")) && !isCreated)
+        string currentTime = timerUi.timerString;
+        string[] timeParts = currentTime.Split(':');
+        if (timeParts.Length == 2)
         {
-            lootScene.SetActive(true);
-            isCreated = true;
+            int minutes, seconds;
+            if (int.TryParse(timeParts[0], out minutes) && int.TryParse(timeParts[1], out seconds))
+            {
+                if (!(minutes == 0 && seconds == 0) && minutes % 2 == 0 && seconds == 0 && !isCreated)
+                {
+                    if (menu.activeInHierarchy)
+                    {
+                        Debug.Log("Menu is active");
+                        hideOut.SetActive(true);
+                        lootScene.SetActive(false);
+                        isCreated = true;
+                    }
+                    else
+                    {
+                        Debug.Log("Menu is not active");
+                        lootScene.SetActive(true);
+                        isCreated = true;
+                    }
+                }
+            }
         }
-
-
     }
+
+
 
     public void CreateRoom(string state)
     {

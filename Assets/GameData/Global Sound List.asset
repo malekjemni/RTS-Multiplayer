@@ -15,8 +15,8 @@ MonoBehaviour:
   ruins:
     mainscreenTheme:
       audioSettings:
-        clip: {fileID: 8300000, guid: fdcdf78c76cd98146b5c096b9c329514, type: 3}
-        volume: 1
+        clip: {fileID: 8300000, guid: cb9e137b7658a3d48953efd6bca77ecd, type: 3}
+        volume: 0.2
         audioType: 2
         pitch: 0.59
         spatialBlend: 0
@@ -26,8 +26,8 @@ MonoBehaviour:
         lifetime: 0
     proceedClick:
       audioSettings:
-        clip: {fileID: 0}
-        volume: 0.5
+        clip: {fileID: 8300000, guid: a6498dc7f4742494797b23a9dfc7fbcd, type: 3}
+        volume: 0.1
         audioType: 2
         pitch: 1
         spatialBlend: 0
@@ -37,8 +37,8 @@ MonoBehaviour:
         lifetime: 0
     gameAtmosphere:
       audioSettings:
-        clip: {fileID: 8300000, guid: 61c41e03d6593cc4994d2ab4a8e99165, type: 3}
-        volume: 0.5
+        clip: {fileID: 8300000, guid: f97f9ad365b102c49a7c1bbf5d57d515, type: 3}
+        volume: 0.3
         audioType: 2
         pitch: 1
         spatialBlend: 0
@@ -48,15 +48,14 @@ MonoBehaviour:
         lifetime: 0
   levelUp:
     audioSettings:
-      clip: {fileID: 8300000, guid: bc7c293979932e44a944efcaa69d773b, type: 3}
+      clip: {fileID: 8300000, guid: 5fa239adef01e4f42bec320980f00af2, type: 3}
       volume: 1
       audioType: 2
       pitch: 1
       spatialBlend: 1
       looping: 0
     effectSettings:
-      effectPrefab: {fileID: 1027995726539321422, guid: 42b05cdeb882b304ca78e555251f7894,
-        type: 3}
+      effectPrefab: {fileID: 1027995726539321422, guid: 42b05cdeb882b304ca78e555251f7894, type: 3}
       lifetime: 0
   crit:
     audioSettings:
@@ -67,8 +66,7 @@ MonoBehaviour:
       spatialBlend: 1
       looping: 0
     effectSettings:
-      effectPrefab: {fileID: 8460747976295487, guid: 9b3fc476b21f2914bb92fe0ce7bdf46b,
-        type: 3}
+      effectPrefab: {fileID: 8460747976295487, guid: 9b3fc476b21f2914bb92fe0ce7bdf46b, type: 3}
       lifetime: 2
   towerPlace:
     audioSettings:
@@ -79,8 +77,7 @@ MonoBehaviour:
       spatialBlend: 1
       looping: 0
     effectSettings:
-      effectPrefab: {fileID: 1334071670866236, guid: edf12e91890b8434eb8ea701f9bc40a2,
-        type: 3}
+      effectPrefab: {fileID: 1334071670866236, guid: edf12e91890b8434eb8ea701f9bc40a2, type: 3}
       lifetime: 2
   upgradeBoughts:
   - audioSettings:

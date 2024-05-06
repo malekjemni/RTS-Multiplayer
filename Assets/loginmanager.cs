@@ -43,23 +43,27 @@ public class loginmanager : MonoBehaviour
         // Vérifier s'il y a des erreurs
         if (request.result != UnityWebRequest.Result.Success)
         {
-            Debug.Log("Erreur de connexion: " + request.error);
-            messageText.text = "Erreur de connexion. Veuillez réessayer.";
+            string responseText = request.downloadHandler.text;
+            JSONObject jsonResponse = new JSONObject(responseText);
+            if (request.responseCode == 404)
+            {
+                string errorMessage =jsonResponse["error"].str;
+                messageText.text = errorMessage;
+            }
+            else { messageText.text = "Erreur de connexion. Veuillez réessayer."; }
+            
             yield break;
         }
         string username = usernameInput.text;
-        // Extraire les données de la réponse JSON
         JSONObject responseData = new JSONObject(request.downloadHandler.text);
         if (responseData.HasField("token"))
         {
-
-
             if (responseData.HasField("token"))
             {
 
-                if (LoadedPlayerData == null) // Correctly check if LoadedPlayerData is null
+                if (LoadedPlayerData == null) 
                 {
-                    LoadedPlayerData = new PlayerData(); // Instantiate it if it is null
+                    LoadedPlayerData = new PlayerData();
                 }
                 string token = responseData["token"].ToString();
                 string id = responseData["player"]["_id"];

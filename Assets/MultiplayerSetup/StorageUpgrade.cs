@@ -1,8 +1,5 @@
 using RtsCam;
-using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
-using UnityEngine.UI;
 
 public class StorageUpgrade : MonoBehaviour
 {
@@ -13,17 +10,22 @@ public class StorageUpgrade : MonoBehaviour
     public UIManager uiManager;
     public GameObject uiElement;
     public RtsCamera rtsCamera;
+    public GameObject prodButton;
 
     public void ToggleUIElement()
     {
         if (uiElement.activeSelf)
         {
             uiElement.SetActive(false);
+            prodButton.SetActive(true);
+            prodButton.GetComponent<RectTransform>().sizeDelta = new Vector2(70, 70);
             rtsCamera.enabled = true;
         }
         else
         {
             uiElement.SetActive(true);
+            prodButton.SetActive(false);
+            prodButton.GetComponent<RectTransform>().sizeDelta = new Vector2(35, 35);
             rtsCamera.enabled = false;
         }
     }
