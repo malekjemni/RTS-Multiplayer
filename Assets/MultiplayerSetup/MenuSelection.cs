@@ -1,4 +1,3 @@
-using RtsCam;
 using System.Collections;
 using System.Collections.Generic;
 using TMPro;
@@ -13,8 +12,16 @@ public class MenuSelection : MonoBehaviour
     public Transform contentParent;
 
 
+    public GameObject tradingPostMenu;
+
+
     public void QuitGame() => Application.Quit();
     public void ShowLeaderBoard() => StartCoroutine(GetLeaderboard());
+    public void ShowTradingPostMenu()
+    {
+        menuGroup.SetActive(false);
+        tradingPostMenu.SetActive(true);
+    }
     public IEnumerator GetLeaderboard()
     {
         string url = $"http://127.0.0.1:9090/leaderboard";

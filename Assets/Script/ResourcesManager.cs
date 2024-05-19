@@ -118,7 +118,7 @@ public class ResourceManager : MonoBehaviour
                 // Cap the resource amount at the maximum allowed value
                 resourceAmounts[type] = maxAmount;
                 OnStorageChange?.Invoke();
-                Debug.Log("Resource amount capped at maximum: " + type);
+                //Debug.Log("Resource amount capped at maximum: " + type);
             }
         }
         else

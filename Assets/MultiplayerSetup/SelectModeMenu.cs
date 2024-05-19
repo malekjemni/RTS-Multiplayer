@@ -11,6 +11,7 @@ public class SelectModeMenu : MonoBehaviour
     public TimerUi timerUi;
     public GameObject menu;
     public GameObject hideOut;
+    public GameObject mailPanel;
 
     private bool isCreated = false;
     private string roomId;
@@ -37,16 +38,14 @@ public class SelectModeMenu : MonoBehaviour
             {
                 if (!(minutes == 0 && seconds == 0) && minutes % 2 == 0 && seconds == 0 && !isCreated)
                 {
-                    if (menu.activeInHierarchy)
+                    if (menu.activeInHierarchy || mailPanel.activeInHierarchy)
                     {
-                        Debug.Log("Menu is active");
                         hideOut.SetActive(true);
                         lootScene.SetActive(false);
                         isCreated = true;
                     }
                     else
                     {
-                        Debug.Log("Menu is not active");
                         lootScene.SetActive(true);
                         isCreated = true;
                     }

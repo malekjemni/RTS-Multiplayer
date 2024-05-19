@@ -126,6 +126,10 @@ public class UIManager : MonoBehaviour
     private void UpdateUiStorage()
     {  
         UpdateStorageAttributesOnServer();
+        WoodStorage.text = playerStorageData.storagewood.ToString();
+        IronStorage.text = playerStorageData.storageclay.ToString();
+        MudStorage.text = playerStorageData.storagemud.ToString();
+        EnergieStorage.text = playerStorageData.storageenergie.ToString();
     }
     private void UpdateUiProduction()
     {
@@ -298,11 +302,7 @@ public class UIManager : MonoBehaviour
                            + ResourceManager.Instance.GetResourceAmountStorage(ResourceType.ETypeWind)
                            + ResourceManager.Instance.GetResourceAmountStorage(ResourceType.ETypeWater)
         };
-        WoodStorage.text = data.storagewood.ToString();
-        IronStorage.text = data.storageclay.ToString();
-        MudStorage.text = data.storagemud.ToString();
-        EnergieStorage.text = data.storageenergie.ToString();
-
+        
         StartCoroutine(UpdateStorageAttributesCoroutine(CurrentUserManager.Instance.GetCurrentUsername(), JsonUtility.ToJson(data)));   
     }
     IEnumerator UpdateStorageAttributesCoroutine(string username, string jsonData)

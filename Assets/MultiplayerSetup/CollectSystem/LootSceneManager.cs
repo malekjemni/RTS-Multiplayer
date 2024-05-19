@@ -1,6 +1,5 @@
 using Mirror;
 using System.Collections;
-using TMPro;
 using UnityEngine;
 using UnityEngine.Networking;
 using UnityEngine.SceneManagement;
@@ -9,6 +8,8 @@ public class LootSceneManager : NetworkBehaviour
 {
     public CountDownTimerUi countDownTimerUi;
     private bool isFinished = false;
+    private bool isStarted = false;
+
 
     private void Start()
     {
@@ -18,7 +19,11 @@ public class LootSceneManager : NetworkBehaviour
 
     private void Update()
     {
-        if (countDownTimerUi.countDownTimerString.Equals("00:00") && !isFinished && TimerSync.Instance.isCountDownTimerRunning)
+        if(!isStarted && countDownTimerUi.countDownTimerString.Equals("00:00"))
+        {
+            isStarted = true;
+        }
+        if (countDownTimerUi.countDownTimerString.Equals("00:00") && !isFinished && TimerSync.Instance.isCountDownTimerRunning && isStarted)
         {
             EndLootScene();
             isFinished = true;

@@ -1,9 +1,7 @@
 using UnityEngine;
 using Mirror;
-using UnityEngine.UIElements;
 using System.Collections;
 using UnityEngine.Networking;
-using System;
 
 public class CollectHandler : NetworkBehaviour
 {
