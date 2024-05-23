@@ -7,15 +7,15 @@ using UnityEngine.Networking;
 public class ResourceManager : MonoBehaviour
 {
 
-    public static event Action<int> OnGemChange; // Événement signalant les changements dans la valeur des gemmes
-    public int Gem { get; set; } = 1000; // Propriété pour la valeur des gemmes
+    public static event Action<int> OnGemChange; 
+    public int Gem { get; set; } = 1000; 
 
-    // Méthode pour modifier la valeur des gemmes et déclencher l'événement
     public void SetGem(int newValue)
     {
         Gem = newValue;
-        OnGemChange?.Invoke(newValue); // Déclencher l'événement avec la nouvelle valeur des gemmes
+        OnGemChange?.Invoke(newValue); 
     }
+   
     public static ResourceManager Instance;
     public static Action OnStorageChange;
     public static Action OnProductionChange;
@@ -98,7 +98,16 @@ public class ResourceManager : MonoBehaviour
         maxResourceAmounts.Add(ResourceType.Iron, MaxCapacityForIron);
     }
 
-
+    public void AddGem(int amount)
+    {
+        Gem += amount;
+        OnGemChange?.Invoke(Gem);
+    }
+    public void SubtractGem(int amount)
+    {
+        Gem -= amount;
+        OnGemChange?.Invoke(Gem);
+    }
     //storage handler
     public void AddResourceStorage(ResourceType type, int amount)
     {

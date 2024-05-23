@@ -66,6 +66,7 @@ public class UIManager : MonoBehaviour
 
     private bool isUpgradeable = false;
     public StorageUpdateData playerStorageData;
+    public UpdatePlayerData updatePlayerData;
     private int lastHighlightedCellIndex = -1;
 
 
@@ -85,10 +86,7 @@ public class UIManager : MonoBehaviour
         LevelUpButton.onClick.AddListener(() => IsUpgradeable(cellDisplay.currentCell));
 
         tgs.OnCellHighlight += OnHoverCell;
-
-
-
-        Gem.text = ResourceManager.Instance.Gem.ToString();
+     
         usernameText.text = CurrentUserManager.Instance.GetCurrentUsername();
     }
 
@@ -245,7 +243,6 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator TimerOn(TerrainCellData cell)
     {
-        Debug.Log("TimerOn");
         int timetowait = cell.level * 30;
         TerrainGridManager.Instance.SetCanUpgradeForCell(cell, false);
         LevelUpButton.gameObject.SetActive(false);
@@ -283,10 +280,8 @@ public class UIManager : MonoBehaviour
         if (cellToLevel.index == cellDisplay.currentCell.index)
         {
             StopCoroutine("TimerOn");
-            timeElapsed = cellToLevel.level * 30;
-            ResourceManager.Instance.Gem -= 50;
+            timeElapsed = cellToLevel.level * 30;  
             UpdateGoldOnServer(50);
-            Gem.text = ResourceManager.Instance.Gem.ToString();
         }
                   
     }
@@ -330,15 +325,14 @@ public class UIManager : MonoBehaviour
         }
     }
     public void UpdateGoldOnServer(int goldChange)
-    {
-        string username = loginmanager.LoadedPlayerData.username; 
-        StartCoroutine(UpdateGoldCoroutine(username, goldChange));
+    { 
+        StartCoroutine(UpdateGoldCoroutine(CurrentUserManager.Instance.GetCurrentUsername(), goldChange));
     }
     IEnumerator UpdateGoldCoroutine(string username, int goldChange)
     {
         string url = $"http://localhost:9090/players/{username}";
-            UpdatePlayerData playerData = new UpdatePlayerData();
-            playerData.gold = loginmanager.LoadedPlayerData.gold - goldChange;
+        UpdatePlayerData playerData = new UpdatePlayerData();
+        playerData.gold = updatePlayerData.gold - goldChange;
 
         string jsonData = JsonUtility.ToJson(playerData);
 
@@ -349,7 +343,9 @@ public class UIManager : MonoBehaviour
 
         if (request.result == UnityWebRequest.Result.Success)
         {
-            Debug.Log("Gold updated successfully on server.");
+            ResourceManager.Instance.SubtractGem(goldChange);
+            updatePlayerData.gold = updatePlayerData.gold - goldChange;
+            Gem.text = updatePlayerData.gold.ToString();
         }
         else
         {
@@ -358,7 +354,6 @@ public class UIManager : MonoBehaviour
     }
     IEnumerator UpdateCellDataRequest(string cellId,int _level)
     {
-        Debug.Log("id : " + cellId + "level" + _level);
         string url = "http://127.0.0.1:9090/cell/" + cellId;
 
         UpdateCellData cell = new UpdateCellData();
@@ -408,6 +403,11 @@ public class UIManager : MonoBehaviour
             ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeSolaire, playerStorageData.storageenergie);
             ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeWind, playerStorageData.storageenergie);
             ResourceManager.Instance.SetResourceStorage(ResourceType.ETypeWater, playerStorageData.storageenergie);
+
+
+            updatePlayerData = JsonUtility.FromJson<UpdatePlayerData>(json);
+            ResourceManager.Instance.SetGem(updatePlayerData.gold);
+            Gem.text = updatePlayerData.gold.ToString();
         }
         else
         {

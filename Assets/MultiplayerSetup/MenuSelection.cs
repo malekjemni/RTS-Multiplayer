@@ -13,6 +13,7 @@ public class MenuSelection : MonoBehaviour
 
 
     public GameObject tradingPostMenu;
+    public GameObject gameShopPanel;
 
 
     public void QuitGame() => Application.Quit();
@@ -21,6 +22,11 @@ public class MenuSelection : MonoBehaviour
     {
         menuGroup.SetActive(false);
         tradingPostMenu.SetActive(true);
+    }
+    public void ShowGameShopPanel()
+    {
+        menuGroup.SetActive(false);
+        gameShopPanel.SetActive(true);
     }
     public IEnumerator GetLeaderboard()
     {

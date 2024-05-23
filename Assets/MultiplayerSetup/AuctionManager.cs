@@ -76,7 +76,7 @@ public class AuctionManager : MonoBehaviour
             OpenAuctionUi();
         }
     }
-   
+  
     public IEnumerator GetAllAuctions()
     {
         UnityWebRequest request = UnityWebRequest.Get(GetAllAuctionsUrl);
@@ -88,7 +88,6 @@ public class AuctionManager : MonoBehaviour
         }
         else
         {
-            Debug.Log("Auctions retrieved: " + request.downloadHandler.text);
             AuctionList auctionList = JsonUtility.FromJson<AuctionList>(request.downloadHandler.text);
             GetAuctionsData(auctionList.auctions);
         }
